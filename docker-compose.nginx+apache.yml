@@ -1,0 +1,51 @@
+{
+    "version": "2",
+    "volumes": {
+        "postgres_data": {},
+        "mysql_data": {}
+    },
+    "services": {
+        "postgres": {
+            "image": "postgres",
+            "volumes": [
+                "postgres_data:/var/lib/postgresql/data"
+            ]
+        },
+        "mysql": {
+            "image": "mysql",
+            "environment": {
+                "MYSQL_ALLOW_EMPTY_PASSWORD": "true",
+                "MYSQL_DATABASE": "joomla"
+            },
+            "volumes": [
+                "./mysql_data/:/var/lib/mysql"
+            ]
+        },
+        "apache": {
+            "build": {
+                "context": ".",
+                "dockerfile": "Dockerfile-apache"
+            },
+            "volumes": [
+                "./www/:/var/www/html"
+            ],
+            "depends_on": [
+                "postgres",
+                "mysql"
+            ]
+        },
+        "nginx": {
+            "image": "nginx:alpine",
+            "volumes": [
+                "./www/:/var/www",
+                "./nginx.apache.conf:/etc/nginx/nginx.conf:ro"
+            ],
+            "ports": [
+                "80:80"
+            ],
+            "depends_on": [
+                "apache"
+            ]
+        }
+    }
+}

@@ -1,0 +1,40 @@
+{
+    "version": "2",
+    "volumes": {
+        "postgres_data": {},
+        "mysql_data": {}
+    },
+    "services": {
+        "postgres": {
+            "image": "postgres",
+            "volumes": [
+                "postgres_data:/var/lib/postgresql/data"
+            ]
+        },
+        "mysql": {
+            "image": "mysql",
+            "environment": {
+                "MYSQL_ALLOW_EMPTY_PASSWORD": "true"
+            },
+            "volumes": [
+                "mysql_data:/var/lib/mysql"
+            ]
+        },
+        "apache": {
+            "build": {
+                "context": ".",
+                "dockerfile": "Dockerfile-apache"
+            },
+            "volumes": [
+                "./:/var/www/html"
+            ],
+            "ports": [
+                "80:80"
+            ],
+            "depends_on": [
+                "postgres",
+                "mysql"
+            ]
+        }
+    }
+}
